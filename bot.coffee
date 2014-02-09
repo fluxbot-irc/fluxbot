@@ -59,7 +59,8 @@ bot.on 'message', (from, to, message) =>
                     global.hasPermission from, plugin.commands[cmd].perm, to, (perm) =>
                         if plugin.commands[cmd].perm != 'none' && !perm
                             return bot.say to, from + ': Error: You don\'t have the "' + plugin.commands[cmd].perm + '" permission for this channel.'
-                        plugin.commands[cmd].run(global, args, from, to)
+                        else
+                            plugin.commands[cmd].run(global, args, from, to)
         if !caught
             bot.say to, 'Command not found. Syntax: [plugin name] [command]'
 bot.on 'error', (err) =>
