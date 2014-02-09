@@ -7,7 +7,7 @@ Core.modify = (g) ->
         g.db.smembers user + '/perms', (err, members) =>
             if perm == 'admin'
                 if members.indexOf(perm) != -1
-                    cb(true)
+                    return cb(true)
                 else
                     return cb(false)
             if members.indexOf(channel + ',' + perm) != -1
