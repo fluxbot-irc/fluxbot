@@ -48,6 +48,8 @@ bot.on 'message', (from, to, message) =>
         caught = false;
         Object.keys(plugins).forEach (plugin) =>
             plugin = plugins[plugin]
+            if !plugin.name
+                plugin.name == 'plugin' + (Math.random() * 100).toFixed(0)
             if message[1] == plugin.name.toLowerCase()
                 if plugin.commands[message[2]]
                     cmd = message[2]
