@@ -2,7 +2,7 @@
     "channels": ["#botwar", "#botters"],
     "server": "chat.freenode.net",
     "nick": "fluxbot",
-    "nickserv_password": process.env.NICKSERV,
+    "nickserv_password": true,
     "redis_host": "127.0.0.1",
     "redis_port": "6379",
     "redis_password": "",

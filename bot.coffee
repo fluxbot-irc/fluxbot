@@ -31,6 +31,8 @@ bot.on 'raw', (data) =>
         when "rpl_endofmotd"
             log.info 'Connected to IRC'
             if config.nickserv_password
+                if config.nickserv_password == true
+                    config.nickserv_password = process.env.NICKSERV
                 bot.say 'NickServ', 'IDENTIFY ' + config.nickserv_password
                 log.info 'Identifying to NickServ'
         when "JOIN" then log.info 'Joined channel', data.args[0]
