@@ -59,4 +59,8 @@ Core.commands.takePerm = new Command {args: 2, perm: 'admin'}, (g, m, u, t) =>
 Core.commands.cycle = new Command {perm: 'admin'}, (g, m, u, t) =>
     g.part(t);
     g.join(t);
+Core.commands.mode = new Command {perm: 'op', args: 2}, (g, m, u, t) =>
+    g.bot.send 'MODE', t, m[0], m[1]
+Core.commands.cmode = new Command {perm: 'op', args: 1}, (g, m, u, t) =>
+    g.bot.send 'MODE', t, m[0]
 module.exports = Core
