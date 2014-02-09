@@ -1,0 +1,24 @@
+# OS X
+.DS_Store
+.AppleDouble
+.LSOverride
+Icon
+._*
+.Spotlight-V100
+.Trashes
+# Linux
+*~
+# Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+*.cab
+*.msi
+*.msm
+*.msp
+# Don't push config.json with NickServ PW
+config.json
+# Don't push node_modules and compiled bot.js
+bot.js
+node_modules/*
