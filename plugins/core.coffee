@@ -44,9 +44,13 @@ Core.commands.remove = new Command {perm: 'op', args: 1}, (g, m, u, t) =>
     g.bot.send 'REMOVE', t, m[0], 'Removed by ' + u
 Core.commands.ban = new Command {perm: 'op', args: 1}, (g, m, u, t) =>
     g.bot.send 'MODE', t, '+b', m[0]
-    g.bot.send 'REMOVE', t, m[0], 'Banned by ' + u
+    g.bot.whois m[0], (whois) =>
+        g.bot.send 'MODE', t, '+b', whois.host
+        g.bot.send 'REMOVE', t, m[0], 'Banned by ' + u
 Core.commands.unban = new Command {perm: 'op', args: 1}, (g, m, u, t) =>
     g.bot.send 'MODE', t, '-b', m[0]
+    g.bot.whois m[0], (whois) =>
+        g.bot.send 'MODE', t, '-b', whois.host
 Core.commands.die = new Command {perm: 'admin', args: 1}, (g, m, u, t) =>
     g.bot.part(t)
     process.exit(0)
