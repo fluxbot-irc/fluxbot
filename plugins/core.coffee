@@ -50,4 +50,10 @@ Core.commands.unban = new Command {perm: 'op', args: 1}, (g, m, u, t) =>
 Core.commands.die = new Command {perm: 'admin', args: 1}, (g, m, u, t) =>
     g.bot.part(t)
     process.exit(0)
+Core.commands.givePerm = new Command {args: 2, perm: 'admin'}, (g, m, u, t) =>
+    g.db.sadd(m[0] + '/perms', t + ',' + m[1]);
+    g.bot.say t, u + ': Giving ' + m[0] + ' the permission ' + t + ',' + m[1]
+Core.commands.takePerm = new Command {args: 2, perm: 'admin'}, (g, m, u, t) =>
+    g.db.srem(m[0] + '/perms', t + ',' + m[1]);
+    g.bot.say t, u + ': Taking ' + m[0] + '\'s permission ' + t + ',' + m[1]
 module.exports = Core
