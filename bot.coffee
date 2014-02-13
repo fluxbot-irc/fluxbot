@@ -57,10 +57,10 @@ bot.on 'message', (from, to, message) =>
                     args.splice(0, 3);
                     caught = true
                     if args.length < plugin.commands[cmd].args
-                        return bot.say to, from + ': That command requires ' + plugin.commands[cmd].args + ' arguments.'
+                        return bot.notice from, 'That command requires ' + plugin.commands[cmd].args + ' arguments.'
                     global.hasPermission from, plugin.commands[cmd].perm, to, (perm) =>
                         if plugin.commands[cmd].perm != 'none' && !perm
-                            return bot.say to, from + ': Error: You don\'t have the "' + plugin.commands[cmd].perm + '" permission for this channel.'
+                            return return bot.notice from, 'Error: You don\'t have the "' + plugin.commands[cmd].perm + '" permission for that channel.'
                         else
                             return plugin.commands[cmd].run(global, args, from, to)
             if Object.keys(plugin.commands).indexOf(message[1]) != -1
@@ -69,14 +69,14 @@ bot.on 'message', (from, to, message) =>
                 args.splice(0, 2);
                 caught = true
                 if args.length < plugin.commands[cmd].args
-                    return bot.say to, from + ': That command requires ' + plugin.commands[cmd].args + ' arguments.'
+                    return bot.notice from, 'That command requires ' + plugin.commands[cmd].args + ' arguments.'
                 global.hasPermission from, plugin.commands[cmd].perm, to, (perm) =>
                     if plugin.commands[cmd].perm != 'none' && !perm
-                        return bot.say to, from + ': Error: You don\'t have the "' + plugin.commands[cmd].perm + '" permission for this channel.'
+                        return bot.notice from, 'Error: You don\'t have the "' + plugin.commands[cmd].perm + '" permission for that channel.'
                     else
                         return plugin.commands[cmd].run(global, args, from, to)
         if !caught
-            bot.say to, 'Command not found. Syntax: [plugin name] [command]'
+            bot.notice from, 'Command not found. Syntax: [plugin name] [command]'
 bot.on 'error', (err) =>
     log.error err
 repl.start {prompt: "fluxbot> ", input: process.stdin, output: process.stdout, useGlobal: true}
