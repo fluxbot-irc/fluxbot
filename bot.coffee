@@ -60,7 +60,7 @@ bot.on 'message', (from, to, message) =>
                         return bot.notice from, 'That command requires ' + plugin.commands[cmd].args + ' arguments.'
                     global.hasPermission from, plugin.commands[cmd].perm, to, (perm) =>
                         if plugin.commands[cmd].perm != 'none' && !perm
-                            return return bot.notice from, 'Error: You don\'t have the "' + plugin.commands[cmd].perm + '" permission for that channel.'
+                            return bot.notice from, 'Error: You don\'t have the "' + plugin.commands[cmd].perm + '" permission for that channel.'
                         else
                             return plugin.commands[cmd].run(global, args, from, to)
             if Object.keys(plugin.commands).indexOf(message[1]) != -1
