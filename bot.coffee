@@ -37,7 +37,6 @@ bot.on 'raw', (data) =>
                     config.nickserv_password = process.env.NICKSERV
                 bot.say 'NickServ', 'IDENTIFY ' + config.nickserv_password
                 log.info 'Identifying to NickServ'
-        when "JOIN" then log.info 'Joined channel', data.args[0]
 bot.on 'notice', (from, to, message) =>
     if from == 'NickServ'
         if message.indexOf('You are now identified') != -1
@@ -54,8 +53,6 @@ bot.on 'message', (from, to, message) =>
         caught = false;
         Object.keys(plugins).forEach (plugin) =>
             plugin = plugins[plugin]
-            if !plugin.name
-                plugin.name == 'plugin' + (Math.random() * 100).toFixed(0)
             if message[1] == plugin.name.toLowerCase()
                 if plugin.commands[message[2]]
                     cmd = message[2]
