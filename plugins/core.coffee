@@ -17,11 +17,13 @@ Core.modify = (g) ->
 Core.commands = {}
 Core.name = 'core'
 Core.commands.help = new Command {}, (g, m, u, t) =>
-    str = 'Available commands: '
-    Object.keys(g.plugins).forEach (plugin) =>
-        plugin = g.plugins[plugin]
-        str += '[' + plugin.name + '] ' + Object.keys(plugin.commands).join(' ') + ' '
-    g.bot.say t, str
+    if m[0]
+        if g.plugins[m[0]]
+            g.bot.say t, '[' + g.plugins[m[0]].name + '] commands: ' + Object.keys(g.plugins[m[0]].commands).join ', '
+        else
+            g.bot.notice u, 'That plugin is not loaded.'
+    else
+        g.bot.say t, 'Loaded plugins: ' + Object.keys(g.plugins).join(', ')
 Core.commands.op = new Command {perm: 'op'}, (g, m, u, t) =>
     if m[0]
         u = m[0]
@@ -61,8 +63,8 @@ Core.commands.takePerm = new Command {args: 2, perm: 'admin'}, (g, m, u, t) =>
     g.db.srem(m[0] + '/perms', t + ',' + m[1]);
     g.bot.say t, u + ': Taking ' + m[0] + '\'s permission ' + t + ',' + m[1]
 Core.commands.cycle = new Command {perm: 'admin'}, (g, m, u, t) =>
-    g.part(t);
-    g.join(t);
+    g.bot.part(t);
+    g.bot.join(t);
 Core.commands.mode = new Command {perm: 'op', args: 2}, (g, m, u, t) =>
     g.bot.send 'MODE', t, m[0], m[1]
 Core.commands.cmode = new Command {perm: 'op', args: 1}, (g, m, u, t) =>
