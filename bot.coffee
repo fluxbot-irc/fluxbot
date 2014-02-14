@@ -79,6 +79,6 @@ bot.on 'message', (from, to, message) =>
                     else
                         return plugin.commands[cmd].run(global, args, from, to)
         if !caught
-            bot.notice from, 'Error: Command not found. Try "' + g.config.nick + ': help [plugin]" for a list of loaded plugins or commands of a specific plugin.'
+            bot.notice from, 'Error: Command not found. Try "' + config.nick + ': help [plugin]" for a list of loaded plugins or commands of a specific plugin.'
 bot.on 'error', (err) =>
     log.error err
