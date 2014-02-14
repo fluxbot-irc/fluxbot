@@ -6,7 +6,7 @@ repl = require 'repl'
 requireDir = require 'require-dir'
 global.config = require './config.json'
 global.plugins = requireDir './plugins'
-global.bot = new irc.Client config.server, config.nick, {channels: [], ident: 'fluxbot', realName: 'Fluxbot'}
+global.bot = new irc.Client config.server, config.nick, {channels: config.channels, ident: 'fluxbot', realName: 'Fluxbot'}
 global.quit = () ->
     process.exit(0)
 Object.keys(plugins).forEach (plugin) =>
@@ -41,10 +41,6 @@ bot.on 'notice', (from, to, message) =>
     if from == 'NickServ'
         if message.indexOf('You are now identified') != -1
             log.info 'Identified with NickServ'
-            log.info 'Joining channels...'
-            config.channels.forEach (channel) =>
-                log.info 'Joining ' + channel + '...'
-                bot.join channel
 bot.on 'invite', (channel, from) =>
     bot.join(channel)
 bot.on 'message', (from, to, message) =>
