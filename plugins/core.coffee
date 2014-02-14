@@ -1,4 +1,4 @@
-r = require 'repl'
+repl = require 'repl'
 coffee = require 'coffee-script/register'
 Command = require '../command.coffee'
 Core = {};
@@ -19,11 +19,14 @@ Core.name = 'core'
 Core.commands.help = new Command {}, (g, m, u, t) =>
     if m[0]
         if g.plugins[m[0]]
-            g.bot.say t, '[' + g.plugins[m[0]].name + '] commands: ' + Object.keys(g.plugins[m[0]].commands).join ', '
+            if Object.keys(g.plugins[m[0]].commands).length == 0 && g.plugins[m[0]].modify
+                g.bot.say t, u + ': [' + g.plugins[m[0]].name + '] is a code-only plugin.'
+            else
+                g.bot.say t, u + ': [' + g.plugins[m[0]].name + '] commands: ' + Object.keys(g.plugins[m[0]].commands).join ', '
         else
             g.bot.notice u, 'That plugin is not loaded.'
     else
-        g.bot.say t, 'Loaded plugins: ' + Object.keys(g.plugins).join(', ')
+        g.bot.say t, u + ': Loaded plugins: ' + Object.keys(g.plugins).join(', ')
 Core.commands.op = new Command {perm: 'op'}, (g, m, u, t) =>
     if m[0]
         u = m[0]
@@ -53,9 +56,14 @@ Core.commands.unban = new Command {perm: 'op', args: 1}, (g, m, u, t) =>
     g.bot.send 'MODE', t, '-b', m[0]
     g.bot.whois m[0], (whois) =>
         g.bot.send 'MODE', t, '-b', whois.host
-Core.commands.die = new Command {perm: 'admin', args: 1}, (g, m, u, t) =>
-    g.bot.part(t)
-    process.exit(0)
+Core.commands.die = new Command {perm: 'admin'}, (g, m, u, t) =>
+    g.bot.part(t, "Fluxbot is shutting down...")
+    setTimeout () =>
+        process.exit(0)
+    , 5000
+Core.commands.repl = new Command {perm: 'admin'}, (g, m, u, t) =>
+    g.bot.say t, u + ': Started a REPL!'
+    repl.start {prompt: "fluxbot> ", input: process.stdin, output: process.stdout, useGlobal: true}
 Core.commands.givePerm = new Command {args: 2, perm: 'admin'}, (g, m, u, t) =>
     g.db.sadd(m[0] + '/perms', t + ',' + m[1]);
     g.bot.say t, u + ': Giving ' + m[0] + ' the permission ' + t + ',' + m[1]
@@ -63,7 +71,7 @@ Core.commands.takePerm = new Command {args: 2, perm: 'admin'}, (g, m, u, t) =>
     g.db.srem(m[0] + '/perms', t + ',' + m[1]);
     g.bot.say t, u + ': Taking ' + m[0] + '\'s permission ' + t + ',' + m[1]
 Core.commands.cycle = new Command {perm: 'admin'}, (g, m, u, t) =>
-    g.bot.part(t);
+    g.bot.part(t, "Cycling channel..");
     g.bot.join(t);
 Core.commands.mode = new Command {perm: 'op', args: 2}, (g, m, u, t) =>
     g.bot.send 'MODE', t, m[0], m[1]

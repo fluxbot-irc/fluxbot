@@ -60,7 +60,7 @@ bot.on 'message', (from, to, message) =>
                     args.splice(0, 3);
                     caught = true
                     if args.length < plugin.commands[cmd].args
-                        return bot.notice from, 'That command requires ' + plugin.commands[cmd].args + ' arguments.'
+                        return bot.notice from, 'Error: That command requires ' + plugin.commands[cmd].args + ' argument(s).'
                     global.hasPermission from, plugin.commands[cmd].perm, to, (perm) =>
                         if plugin.commands[cmd].perm != 'none' && !perm
                             return bot.notice from, 'Error: You don\'t have the "' + plugin.commands[cmd].perm + '" permission for that channel.'
@@ -72,14 +72,13 @@ bot.on 'message', (from, to, message) =>
                 args.splice(0, 2);
                 caught = true
                 if args.length < plugin.commands[cmd].args
-                    return bot.notice from, 'That command requires ' + plugin.commands[cmd].args + ' arguments.'
+                    return bot.notice from, 'Error: That command requires ' + plugin.commands[cmd].args + ' argument(s).'
                 global.hasPermission from, plugin.commands[cmd].perm, to, (perm) =>
                     if plugin.commands[cmd].perm != 'none' && !perm
                         return bot.notice from, 'Error: You don\'t have the "' + plugin.commands[cmd].perm + '" permission for that channel.'
                     else
                         return plugin.commands[cmd].run(global, args, from, to)
         if !caught
-            bot.notice from, 'Command not found. Syntax: [plugin name] [command]'
+            bot.notice from, 'Error: Command not found. Try "' + g.config.nick + ': help [plugin]" for a list of loaded plugins or commands of a specific plugin.'
 bot.on 'error', (err) =>
     log.error err
-repl.start {prompt: "fluxbot> ", input: process.stdin, output: process.stdout, useGlobal: true}
