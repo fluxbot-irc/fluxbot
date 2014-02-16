@@ -1,6 +1,6 @@
 {
   "name": "fluxbot",
-  "version": "0.0.1",
+  "version": "1.0.0",
   "description": "lightweight, flexible node.js irc bot",
   "main": "bot.js",
   "scripts": {

@@ -20,5 +20,4 @@ $RECYCLE.BIN/
 # Don't push config.json with NickServ PW
 config.json
 # Don't push node_modules and compiled bot.js
-bot.js
 node_modules/*
