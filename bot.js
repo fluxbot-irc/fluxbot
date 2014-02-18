@@ -20,6 +20,7 @@ global.plugins = requireDir('./plugins');
 
 global.bot = new irc.Client(config.server, config.nick, {
     channels: config.channels,
+    password: config.nickserv_password,
     userName: config.nick,
     realName: 'Fluxbot ' + require('./package.json').version + ' - http://github.com/WeekendOfCode/fluxbot'
 });
@@ -63,13 +64,6 @@ bot.on('raw', function (data) {
     switch (data.command) {
     case "rpl_endofmotd":
         log.info('Connected to ' + config.server);
-        if (config.nickserv_password) {
-            if (config.nickserv_password === true) {
-                config.nickserv_password = process.env.NICKSERV;
-            }
-            bot.say('NickServ', 'IDENTIFY ' + config.nickserv_password);
-            return log.info('Identifying to NickServ');
-        }
     }
 });
 
