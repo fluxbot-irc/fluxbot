@@ -85,4 +85,35 @@ Core.commands.part = new Command {perm: 'admin', args: 1}, (g, m, u, t) =>
     g.bot.part m[0]
 Core.commands.say = new Command {perm: 'op', args: 1}, (g, m, u, t) =>
     g.bot.say t, m.join ' '
+Core.commands.myperms = new Command {}, (g, m, u, t) =>
+    g.db.smembers u + '/perms', (err, perms) =>
+        g.bot.say t, u + ': ' + perms.join(' ')
+Core.commands.chanperms = new Command {}, (g, m, u, t) =>
+    g.db.smembers u + '/perms', (err, perms) =>
+        perms.forEach (perm, i) =>
+            if perm.indexOf(t) == -1
+                perms.splice i, 1
+            else
+                perm = perm.replace(t + ',', '')
+        g.bot.say t, u + ': ' + perms.join(' ');
+Core.commands.chanstats = new Command {}, (g, m, u, t) =>
+    g.db.smembers u + '/perms', (err, perms) =>
+        str = u + ': '
+        if perms.indexOf('admin') != -1
+            str += 'You are a fluxbot admin! | '
+        else
+            str += ''
+        if perms.indexOf(t + ',op') != -1
+            str += 'Operator: true | '
+        else
+            str += 'Operator: false | '
+        if perms.indexOf(t + ',autoop') != -1
+            str += 'Auto-op: true | '
+        else
+            str += 'Auto-op: false | '
+        if perms.indexOf(t + ',voice') != -1
+            str += 'Voice: true'
+        else
+            str += 'Voice: false'
+        g.bot.say t, str
 module.exports = Core
