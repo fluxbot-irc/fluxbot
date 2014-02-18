@@ -77,4 +77,12 @@ Core.commands.mode = new Command {perm: 'op', args: 2}, (g, m, u, t) =>
     g.bot.send 'MODE', t, m[0], m[1]
 Core.commands.cmode = new Command {perm: 'op', args: 1}, (g, m, u, t) =>
     g.bot.send 'MODE', t, m[0]
+Core.commands.join = new Command {perm: 'admin', args: 1}, (g, m, u, t) =>
+    g.bot.notice u, 'Joining ' + m[0]
+    g.bot.join m[0]
+Core.commands.part = new Command {perm: 'admin', args: 1}, (g, m, u, t) =>
+    g.bot.notice u, 'Leaving ' + m[0]
+    g.bot.part m[0]
+Core.commands.say = new Command {perm: 'op', args: 1}, (g, m, u, t) =>
+    g.bot.say t, m.join ' '
 module.exports = Core

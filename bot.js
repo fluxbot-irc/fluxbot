@@ -38,7 +38,7 @@ Object.keys(plugins).forEach(function (plugin) {
     }
 });
 
-log.info('Starting Fluxbot '  + require('./package.json').version);
+log.info('Starting Fluxbot ' + require('./package.json').version);
 log.info('Loaded plugins:', Object.keys(plugins).join(', '));
 log.info('Connecting to', config.server);
 log.info('Connecting to Redis DB...');
@@ -88,7 +88,7 @@ bot.on('invite', function (channel, from) {
 bot.on('message', function (from, to, message) {
     var caught;
     message = message.split(' ');
-    if (message[0] === config.nick + ':') {
+    if (message[0] === config.nick + ':' || message[0] == config.prefix) {
         caught = false;
         Object.keys(plugins).forEach(function (plugin) {
             var args, cmd;
