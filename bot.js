@@ -18,8 +18,13 @@ global.config = require('./config.json');
 
 global.plugins = requireDir('./plugins');
 
+if (!config.port) {
+    config.port = 6667;
+}
+
 global.bot = new irc.Client(config.server, config.nick, {
     channels: config.channels,
+    port: config.port,
     password: config.nickserv_password,
     userName: config.nick,
     realName: 'Fluxbot ' + require('./package.json').version + ' - http://github.com/WeekendOfCode/fluxbot'
