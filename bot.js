@@ -1,4 +1,4 @@
-var coffee, irc, log, redis, repl, requireDir,
+var coffee, irc, log, redis, repl, ready, requireDir,
     _this = this;
 irc = require('irc');
 
@@ -7,6 +7,8 @@ coffee = require('coffee-script/register');
 log = require('winston');
 
 redis = require('redis');
+
+ready = false;
 
 repl = require('repl');
 
@@ -18,8 +20,8 @@ global.plugins = requireDir('./plugins');
 
 global.bot = new irc.Client(config.server, config.nick, {
     channels: config.channels,
-    ident: 'fluxbot',
-    realName: 'Fluxbot'
+    userName: config.nick,
+    realName: 'Fluxbot ' + require('./package.json').version + ' - http://github.com/WeekendOfCode/fluxbot'
 });
 
 global.quit = function () {
@@ -48,11 +50,10 @@ if (config.redis_password) {
 }
 
 db.on('ready', function () {
-    return log.info('Connected to Redis');
-});
-
-db.on('error', function (err) {
-    return log.info('DB error:', err);
+    if (!ready) {
+        return log.info('Connected to Redis');
+        ready = true
+    }
 });
 
 bot.on('raw', function (data) {
@@ -61,7 +62,7 @@ bot.on('raw', function (data) {
     }
     switch (data.command) {
     case "rpl_endofmotd":
-        log.info('Connected to IRC');
+        log.info('Connected to ' + config.server);
         if (config.nickserv_password) {
             if (config.nickserv_password === true) {
                 config.nickserv_password = process.env.NICKSERV;
@@ -82,8 +83,8 @@ bot.on('notice', function (from, to, message) {
 
 bot.on('invite', function (channel, from) {
     return bot.join(channel);
+    bot.notice(from, 'Joining ' + channel);
 });
-
 bot.on('message', function (from, to, message) {
     var caught;
     message = message.split(' ');
