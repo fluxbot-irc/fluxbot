@@ -38,9 +38,9 @@ Core.commands.list = new Command {}, (g, m, u, t) =>
 Core.commands.commands = new Command {desc: 'List a plugin\'s commands', args: 1}, (g, m, u, t) =>
     if g.plugins[m[0]]
         if Object.keys(g.plugins[m[0]].commands).length == 0 && g.plugins[m[0]].modify
-                g.bot.say t, u + ': [' + g.plugins[m[0]].name + '] is a code-only plugin.'
+                g.bot.say u, '[' + g.plugins[m[0]].name + '] is a code-only plugin.'
             else
-                g.bot.say t, u + ': [' + g.plugins[m[0]].name + '] commands: ' + Object.keys(g.plugins[m[0]].commands).join ', '
+                g.bot.say u, '[' + g.plugins[m[0]].name + '] commands: ' + Object.keys(g.plugins[m[0]].commands).join ', '
     else
         g.bot.notice u, 'That plugin is not loaded.'
 Core.commands.op = new Command {perm: 'op'}, (g, m, u, t) =>
