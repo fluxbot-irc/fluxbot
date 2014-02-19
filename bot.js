@@ -95,7 +95,7 @@ bot.on('message', function (from, to, message) {
     if (!config.chanprefix[to]) {
         config.chanprefix[to] = config.prefix;
     }
-    if (message[0] === config.nick + ':' || (message[0] == config.prefix && message[0] == config.chanprefix[to]) || message[0] == config.chanprefix[to]) {
+    if (message[0] === config.nick + ':' || message[0] == config.chanprefix[to]) {
         caught = false;
         Object.keys(plugins).forEach(function (plugin) {
             var args, cmd;
