@@ -21,7 +21,9 @@ global.plugins = requireDir('./plugins');
 if (!config.port) {
     config.port = 6667;
 }
-
+if (!config.chanprefix) {
+    config.chanprefix = {};
+}
 global.bot = new irc.Client(config.server, config.nick, {
     channels: config.channels,
     port: config.port,
@@ -90,7 +92,14 @@ bot.on('invite', function (channel, from) {
 bot.on('message', function (from, to, message) {
     var caught;
     message = message.split(' ');
+    if (config.chanprefix[to]) {
+        config.prefixold = config.prefix;
+        config.prefix = config.chanprefix[to];
+    }
     if (message[0] === config.nick + ':' || message[0] == config.prefix) {
+        if (config.chanprefix[to]) {
+            config.prefix = config.prefixold;
+        }
         caught = false;
         Object.keys(plugins).forEach(function (plugin) {
             var args, cmd;
