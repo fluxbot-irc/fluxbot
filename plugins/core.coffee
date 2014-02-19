@@ -132,4 +132,6 @@ Core.commands.chanstats = new Command {}, (g, m, u, t) =>
         else
             str += 'Voice: false'
         g.bot.say t, str
+Core.commands.version = new Command {}, (g, m, u, t) =>
+    g.bot.say t, u + ': Fluxbot version ' + require('../package.json').version + ' by whiskers75 - https://github.com/WeekendOfCode/fluxbot'
 module.exports = Core
