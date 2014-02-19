@@ -73,10 +73,7 @@ Core.commands.unban = new Command {perm: 'op', args: 1}, (g, m, u, t) =>
     g.bot.whois m[0], (whois) =>
         g.bot.send 'MODE', t, '-b', whois.host
 Core.commands.die = new Command {perm: 'admin'}, (g, m, u, t) =>
-    g.bot.part(t, "Fluxbot is shutting down...")
-    setTimeout () =>
-        process.exit(0)
-    , 5000
+    process.exit(0);
 Core.commands.repl = new Command {perm: 'admin'}, (g, m, u, t) =>
     g.bot.say t, u + ': Started a REPL!'
     repl.start {prompt: "fluxbot> ", input: process.stdin, output: process.stdout, useGlobal: true}
