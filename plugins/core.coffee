@@ -1,6 +1,5 @@
 repl = require 'repl'
-coffee = require 'coffee-script/register'
-Command = require '../command.coffee'
+Command = require '../command.js'
 Core = {};
 Core.modify = (g) ->
     g.hasPermission = (user, perm, channel, cb) =>
@@ -16,17 +15,34 @@ Core.modify = (g) ->
                 cb(false)
 Core.commands = {}
 Core.name = 'core'
-Core.commands.help = new Command {}, (g, m, u, t) =>
+Core.desc = 'A set of built-in Fluxbot commands to make running your bot easy.'
+Core.commands.help = new Command {desc: 'help [plugin] [command] - Gives you help on commands and plugins. "list" will list the available plugins, "commands [plugin]" will list a plugin\'s commands.'}, (g, m, u, t) =>
     if m[0]
+        tmp = false
         if g.plugins[m[0]]
-            if Object.keys(g.plugins[m[0]].commands).length == 0 && g.plugins[m[0]].modify
+            tmp = true
+            g.bot.say u, '[' + g.plugins[m[0]].name + ']: ' + g.plugins[m[0]].desc
+        Object.keys(g.plugins).forEach (plugin) =>
+            plugin = g.plugins[plugin];
+            if plugin.commands[m[0]]
+                tmp = true
+                g.bot.say u, '[' + plugin.name + '] [' + m[0] + ']: ' + plugin.commands[m[0]].desc
+                g.bot.say u, '[' + plugin.name + '] [' + m[0] + ']: Required permission: ' + plugin.commands[m[0]].perm
+        if !tmp
+            g.bot.notice u, 'No matches found.'
+    else
+        g.bot.say u, 'help [plugin/command] - Gives you help on commands and plugins.'
+        g.bot.say u, '"list" will list the available plugins, "commands [plugin]" will list a plugin\'s commands.'
+Core.commands.list = new Command {}, (g, m, u, t) =>
+    g.bot.say t, u + ': Loaded plugins: ' + Object.keys(g.plugins).join(', ')
+Core.commands.commands = new Command {desc: 'List a plugin\'s commands', args: 1}, (g, m, u, t) =>
+    if g.plugins[m[0]]
+        if Object.keys(g.plugins[m[0]].commands).length == 0 && g.plugins[m[0]].modify
                 g.bot.say t, u + ': [' + g.plugins[m[0]].name + '] is a code-only plugin.'
             else
                 g.bot.say t, u + ': [' + g.plugins[m[0]].name + '] commands: ' + Object.keys(g.plugins[m[0]].commands).join ', '
-        else
-            g.bot.notice u, 'That plugin is not loaded.'
     else
-        g.bot.say t, u + ': Loaded plugins: ' + Object.keys(g.plugins).join(', ')
+        g.bot.notice u, 'That plugin is not loaded.'
 Core.commands.op = new Command {perm: 'op'}, (g, m, u, t) =>
     if m[0]
         u = m[0]

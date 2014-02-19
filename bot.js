@@ -42,6 +42,9 @@ Object.keys(plugins).forEach(function (plugin) {
     if (plugin.modify) {
         return plugin.modify(global);
     }
+    if (!plugin.desc) {
+        plugin.desc = 'No description given'
+    }
 });
 
 log.info('Starting Fluxbot ' + require('./package.json').version);

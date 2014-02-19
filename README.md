@@ -20,6 +20,7 @@ API documentation:
 
 ### The `Command()` object
 ```
+var Command = require('../command.js')
 Plugin.commands.foo = new Command({
     args: 1, // The amount of arguments your command takes (optional)
     perm: 'fooer', // Required permission for your command (optional)
