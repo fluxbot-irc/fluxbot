@@ -92,14 +92,10 @@ bot.on('invite', function (channel, from) {
 bot.on('message', function (from, to, message) {
     var caught;
     message = message.split(' ');
-    if (config.chanprefix[to]) {
-        config.prefixold = config.prefix;
-        config.prefix = config.chanprefix[to];
+    if (!config.chanprefix[to]) {
+        config.chanprefix[to] = config.prefix;
     }
-    if (message[0] === config.nick + ':' || message[0] == config.prefix) {
-        if (config.chanprefix[to]) {
-            config.prefix = config.prefixold;
-        }
+    if (message[0] === config.nick + ':' || (message[0] == config.prefix && message[0] == config.chanprefix[to]) || message[0] == config.chanprefix[to]) {
         caught = false;
         Object.keys(plugins).forEach(function (plugin) {
             var args, cmd;
