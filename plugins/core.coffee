@@ -17,7 +17,7 @@ Core.commands = {}
 Core.name = 'core'
 Core.desc = 'A set of built-in Fluxbot commands to make running your bot easy.'
 Core.commands.help = new Command {desc: 'help [plugin] [command] - Gives you help on commands and plugins. "list" will list the available plugins, "commands [plugin]" will list a plugin\'s commands.'}, (g, m, u, t) =>
-    g.bot.say t, u + ': PMd info.'
+    g.bot.say t, u + ': Sent a PM!'
     if m[0]
         tmp = false
         if g.plugins[m[0]]
@@ -35,9 +35,10 @@ Core.commands.help = new Command {desc: 'help [plugin] [command] - Gives you hel
         g.bot.say u, 'help [plugin/command] - Gives you help on commands and plugins.'
         g.bot.say u, '"list" will list the available plugins, "commands [plugin]" will list a plugin\'s commands.'
 Core.commands.list = new Command {}, (g, m, u, t) =>
-    g.bot.say t, u + ': Loaded plugins: ' + Object.keys(g.plugins).join(', ')
+    g.bot.say t, u + ': Sent a PM!'
+    g.bot.say u, 'Loaded plugins: ' + Object.keys(g.plugins).join(', ')
 Core.commands.commands = new Command {desc: 'List a plugin\'s commands', args: 1}, (g, m, u, t) =>
-    g.bot.say t, u + ': PMd info.'
+    g.bot.say t, u + ': Sent a PM!'
     if g.plugins[m[0]]
         if Object.keys(g.plugins[m[0]].commands).length == 0 && g.plugins[m[0]].modify
                 g.bot.say u, '[' + g.plugins[m[0]].name + '] is a code-only plugin.'
