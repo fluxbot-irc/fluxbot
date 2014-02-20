@@ -15,6 +15,8 @@ API documentation:
 
 - `Plugin.name` - human readable name. Used to call your plugin: `fluxbot: [plugin name] [command]`
 - `Plugin.modify(global)` - your chance to customize the global object or initialize some external dependency. Gets called on plugin load. Set to `false` if you don't use this.
+- `Plugin.desc` - describe your plugin.
+- `Plugin.dependencies` - array of plugins which should be loaded before this one (runs their global function)
 - `Plugin.commands` - an object containing commands.
 - `Plugin.commands.[command]` - a `new Command()`
 

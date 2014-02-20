@@ -18,13 +18,12 @@ global.config = require('./config.json');
 global.plugins = {};
 global.loadPlugins = function() {
     log.info('Loading plugins');
+    var nomod = [];
     fs.readdirSync('./plugins').forEach(function(file) {
         var modify = true;
-        log.info('Loading ' + __dirname + '/plugins/' + file + ' as ' + file.split('.')[0]);
         if (require.cache[__dirname + '/plugins/' + file]) {
-            log.info('Clearing require cache for ' + __dirname + '/plugins/' + file)
             delete require.cache[__dirname + '/plugins/' + file];
-            modify = false; // Don't modify twice!
+            nomod.push(file.split('.')[0]);
         }
         plugins[file.split('.')[0]] = require(__dirname + '/plugins/' + file);
         plugins[file.split('.')[0]].name = file.split('.')[0];
@@ -32,11 +31,57 @@ global.loadPlugins = function() {
             plugins[file.split('.')[0]].desc = 'No description given'
         }
         log.info('Loaded plugin ' + file.split('.')[0] + ' - ' + plugins[file.split('.')[0]].desc);
-        if (modify && plugins[file.split('.')[0]].modify) {
-            log.info('Running modify script for ' + file.split('.')[0]);
-            plugins[file.split('.')[0]].modify(global);
+    });
+    log.info('Resolving dependencies');
+    var modified = [];
+    Object.keys(plugins).forEach(function(plugin) {
+        plugin = plugins[plugin];
+        if (nomod.indexOf(plugin.name) != -1 || modified.indexOf(plugin.name) != -1) {
+            modified.push(plugin.name); // no-op
+            log.info('Already satisfied plugin ' + plugin.name);
+            return;
+        }
+        if (plugin.dependencies && plugin.modify) {
+            log.info('Resolving plugin ' + plugin.name);
+            var errors = false;
+            plugin.dependencies.forEach(function(plugin) {
+                if (!plugins[plugin]) {
+                    log.error('Dependency not fulfilled: ' + plugin);
+                    modified.push(plugin);
+                    errors = true;
+                    return;
+                }
+                plugin = plugins[plugin];
+                if (modified.indexOf(plugin.name) != -1) {
+                    return;
+                }
+                else {
+                    if (plugin.modify) {
+                        plugin.modify(global);
+                    }
+                    modified.push(plugin.name);
+                    log.info('Satisfied dependency ' + plugin.name);
+                }
+            });
+            if (!errors) {
+                plugin.modify(global);
+                modified.push(plugin.name);
+                log.info('Satisfied plugin ' + plugin.name);
+            }
+            else {
+                log.error('Failed to satisfy plugin ' + plugin.name);
+                delete plugins[plugin.name];
+            }
+        }
+        else {
+            if (plugin.modify) {
+                plugin.modify(global);
+            }
+            modified.push(plugin.name);
+            log.info('Satisfied plugin ' + plugin.name);
         }
     });
+    log.info('Plugin loading complete! \\o/');
 }
 
 if (!config.port) {
@@ -84,7 +129,6 @@ db.on('ready', function () {
         ready = true
     }
 });
-
 bot.on('raw', function (data) {
     if (config.debug) {
         log.info(data.command, data.args.join(' '));

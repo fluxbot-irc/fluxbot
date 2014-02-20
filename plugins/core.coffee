@@ -99,6 +99,8 @@ Core.commands.part = new Command {perm: 'admin', args: 1, usage: '<channel>', de
     g.bot.part m[0]
 Core.commands.say = new Command {perm: 'op', args: 1, usage: '<text>', desc: 'Says <text>.'}, (g, m, u, t) =>
     g.bot.say t, m.join ' '
+Core.commands.action = new Command {perm: 'op', args: 1, usage: '<text>', desc: 'Actions <text>.'}, (g, m, u, t) =>
+    g.bot.action t, m.join ' '
 Core.commands.myperms = new Command {usage: '', desc: 'Lists your global permissions.'}, (g, m, u, t) =>
     g.db.smembers u + '/perms', (err, perms) =>
         g.bot.say u, 'Your permissions: ' + perms.join(' ')
