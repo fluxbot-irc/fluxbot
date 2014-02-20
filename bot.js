@@ -1,4 +1,4 @@
-var coffee, irc, log, redis, repl, ready, requireDir,
+var coffee, irc, log, redis, repl, ready, fs,
     _this = this;
 irc = require('irc');
 
@@ -12,11 +12,32 @@ ready = false;
 
 repl = require('repl');
 
-requireDir = require('require-dir');
+fs = require('fs');
 
 global.config = require('./config.json');
-
-global.plugins = requireDir('./plugins');
+global.plugins = {};
+global.loadPlugins = function() {
+    log.info('Loading plugins');
+    fs.readdirSync('./plugins').forEach(function(file) {
+        var modify = true;
+        log.info('Loading ' + __dirname + '/plugins/' + file + ' as ' + file.split('.')[0]);
+        if (require.cache[__dirname + '/plugins/' + file]) {
+            log.info('Clearing require cache for ' + __dirname + '/plugins/' + file)
+            delete require.cache[__dirname + '/plugins/' + file];
+            modify = false; // Don't modify twice!
+        }
+        plugins[file.split('.')[0]] = require(__dirname + '/plugins/' + file);
+        plugins[file.split('.')[0]].name = file.split('.')[0];
+        if (typeof plugins[file.split('.')[0]].desc == 'undefined') {
+            plugins[file.split('.')[0]].desc = 'No description given'
+        }
+        log.info('Loaded plugin ' + file.split('.')[0] + ' - ' + plugins[file.split('.')[0]].desc);
+        if (modify && plugins[file.split('.')[0]].modify) {
+            log.info('Running modify script for ' + file.split('.')[0]);
+            plugins[file.split('.')[0]].modify(global);
+        }
+    });
+}
 
 if (!config.port) {
     config.port = 6667;
@@ -29,7 +50,7 @@ global.bot = new irc.Client(config.server, config.nick, {
     port: config.port,
     password: config.nickserv_password,
     userName: config.nick,
-    realName: 'Fluxbot ' + require('./package.json').version + ' - http://github.com/WeekendOfCode/fluxbot'
+    realName: 'Fluxbot ' + require('./package.json').version
 });
 
 global.quit = function () {
@@ -37,12 +58,8 @@ global.quit = function () {
 };
 
 Object.keys(plugins).forEach(function (plugin) {
-    var pname;
-    pname = plugin;
-    plugin = plugins[plugin];
-    plugin.name = pname;
     if (plugin.modify) {
-        return plugin.modify(global);
+        plugin.modify(global);
     }
     if (!plugin.desc) {
         plugin.desc = 'No description given'
@@ -50,6 +67,7 @@ Object.keys(plugins).forEach(function (plugin) {
 });
 
 log.info('Starting Fluxbot ' + require('./package.json').version);
+loadPlugins();
 log.info('Loaded plugins:', Object.keys(plugins).join(', '));
 log.info('Connecting to', config.server);
 log.info('Connecting to Redis DB...');
@@ -95,6 +113,11 @@ bot.on('message', function (from, to, message) {
     if (!config.chanprefix[to]) {
         config.chanprefix[to] = config.prefix;
     }
+    Object.keys(plugins).forEach(function (plugin) {
+        if (plugin.onMessage) {
+            plugin.onMessage(global, from, to, message, (message[0] === config.nick + ':' || message[0] == config.chanprefix[to]));
+        }
+    });
     if (message[0] === config.nick + ':' || message[0] == config.chanprefix[to]) {
         caught = false;
         Object.keys(plugins).forEach(function (plugin) {

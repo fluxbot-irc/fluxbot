@@ -76,6 +76,7 @@ Core.commands.unban = new Command {perm: 'op', args: 1}, (g, m, u, t) =>
     g.bot.whois m[0], (whois) =>
         g.bot.send 'MODE', t, '-b', whois.host
 Core.commands.die = new Command {perm: 'admin'}, (g, m, u, t) =>
+    g.bot.say t, u + ': *urk*'
     process.exit(0);
 Core.commands.repl = new Command {perm: 'admin'}, (g, m, u, t) =>
     g.bot.say t, u + ': Started a REPL!'
@@ -103,7 +104,7 @@ Core.commands.say = new Command {perm: 'op', args: 1}, (g, m, u, t) =>
     g.bot.say t, m.join ' '
 Core.commands.myperms = new Command {}, (g, m, u, t) =>
     g.db.smembers u + '/perms', (err, perms) =>
-        g.bot.say t, u + ': ' + perms.join(' ')
+        g.bot.say u, 'Your permissions: ' + perms.join(' ')
 Core.commands.chanperms = new Command {}, (g, m, u, t) =>
     g.db.smembers u + '/perms', (err, perms) =>
         perms.forEach (perm, i) =>
@@ -111,7 +112,7 @@ Core.commands.chanperms = new Command {}, (g, m, u, t) =>
                 perms.splice i, 1
             else
                 perm = perm.replace(t + ',', '')
-        g.bot.say t, u + ': ' + perms.join(' ');
+        g.bot.say u, 'Your permissions for ' + t + ': ' + perms.join(' ');
 Core.commands.chanstats = new Command {}, (g, m, u, t) =>
     g.db.smembers u + '/perms', (err, perms) =>
         str = u + ': '
@@ -134,4 +135,8 @@ Core.commands.chanstats = new Command {}, (g, m, u, t) =>
         g.bot.say t, str
 Core.commands.version = new Command {}, (g, m, u, t) =>
     g.bot.say t, u + ': Fluxbot version ' + require('../package.json').version + ' by whiskers75 - https://github.com/WeekendOfCode/fluxbot'
+Core.commands.hotboot = new Command {perm: 'admin'}, (g, m, u, t) =>
+    g.bot.say t, u + ': Reloading Fluxbot...'
+    g.loadPlugins();
+    g.bot.say t, u + ': Reload complete.'
 module.exports = Core

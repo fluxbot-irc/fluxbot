@@ -1,6 +1,6 @@
 {
   "name": "fluxbot",
-  "version": "1.0.2",
+  "version": "1.5.0",
   "description": "lightweight, flexible node.js irc bot",
   "main": "bot.js",
   "scripts": {
@@ -14,7 +14,6 @@
   "license": "BSD",
   "readmeFilename": "README.md",
   "dependencies": {
-    "require-dir": "~0.1.0",
     "irc": "git://github.com/WhiskTech/node-irc#master",
     "redis": "~0.10.0",
     "coffee-script": "~1.7.1",
