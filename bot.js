@@ -131,7 +131,8 @@ bot.on('message', function (from, to, message) {
                     caught = true;
                     if (args.length < plugin.commands[cmd].args) {
                         bot.notice(from, 'That command requires ' + plugin.commands[cmd].args + ' argument(s).');
-                        return bot.notice(from, config.chanprefix[to] + ' ' + cmd + ' ' + plugin.commands[cmd].usage);
+                        bot.notice(from, config.chanprefix[to] + ' ' + cmd + ' ' + plugin.commands[cmd].usage);
+                        return bot.notice(from, 'Description: ' + plugin.commands[cmd].desc);
                     }
                     global.hasPermission(from, plugin.commands[cmd].perm, to, function (perm) {
                         if (plugin.commands[cmd].perm !== 'none' && !perm) {
@@ -149,7 +150,8 @@ bot.on('message', function (from, to, message) {
                 caught = true;
                 if (args.length < plugin.commands[cmd].args) {
                     bot.notice(from, 'That command requires ' + plugin.commands[cmd].args + ' argument(s).');
-                    return bot.notice(from, config.chanprefix[to] + ' ' + cmd + ' ' + plugin.commands[cmd].usage);
+                    bot.notice(from, config.chanprefix[to] + ' ' + cmd + ' ' + plugin.commands[cmd].usage);
+                    return bot.notice(from, 'Description: ' + plugin.commands[cmd].desc);
                 }
                 return global.hasPermission(from, plugin.commands[cmd].perm, to, function (perm) {
                     if (plugin.commands[cmd].perm !== 'none' && !perm) {
