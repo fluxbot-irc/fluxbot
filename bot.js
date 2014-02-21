@@ -16,10 +16,10 @@ fs = require('fs');
 
 global.config = require('./config.json');
 global.plugins = {};
-global.loadPlugins = function() {
+global.loadPlugins = function () {
     log.info('Loading plugins');
     var nomod = [];
-    fs.readdirSync('./plugins').forEach(function(file) {
+    fs.readdirSync('./plugins').forEach(function (file) {
         var modify = true;
         if (require.cache[__dirname + '/plugins/' + file]) {
             delete require.cache[__dirname + '/plugins/' + file];
@@ -34,7 +34,8 @@ global.loadPlugins = function() {
     });
     log.info('Resolving dependencies');
     var modified = [];
-    Object.keys(plugins).forEach(function(plugin) {
+    var currentPlugin = 'none';
+    function resolvePlugin(plugin, depth) {
         plugin = plugins[plugin];
         if (nomod.indexOf(plugin.name) != -1 || modified.indexOf(plugin.name) != -1) {
             modified.push(plugin.name); // no-op
@@ -43,43 +44,49 @@ global.loadPlugins = function() {
         }
         if (plugin.dependencies && plugin.modify) {
             log.info('Resolving plugin ' + plugin.name);
+            if (!depth) {
+                currentPlugin = plugin.name;
+            }
             var errors = false;
-            plugin.dependencies.forEach(function(plugin) {
+            plugin.dependencies.forEach(function (plugin) {
+                if (depth) {
+                    log.info('Resolving dependency ' + plugin + ' [resolving: ' + currentPlugin + ']')
+                }
+                else {
+                    log.info('Resolving dependency ' + plugin)
+                }
                 if (!plugins[plugin]) {
                     log.error('Dependency not fulfilled: ' + plugin);
                     modified.push(plugin);
                     errors = true;
                     return;
                 }
-                plugin = plugins[plugin];
-                if (modified.indexOf(plugin.name) != -1) {
+                if (plugin == currentPlugin) {
+                    log.error('Circular dependency found in plugins: ' + currentPlugin + ' + ' + plugin);
+                    errors = true;
+                    modified.push(plugin);
                     return;
                 }
-                else {
-                    if (plugin.modify) {
-                        plugin.modify(global);
-                    }
-                    modified.push(plugin.name);
-                    log.info('Satisfied dependency ' + plugin.name);
-                }
+                resolvePlugin(plugin, true);
             });
             if (!errors) {
                 plugin.modify(global);
                 modified.push(plugin.name);
                 log.info('Satisfied plugin ' + plugin.name);
-            }
-            else {
+            } else {
                 log.error('Failed to satisfy plugin ' + plugin.name);
                 delete plugins[plugin.name];
             }
-        }
-        else {
+        } else {
             if (plugin.modify) {
                 plugin.modify(global);
             }
             modified.push(plugin.name);
             log.info('Satisfied plugin ' + plugin.name);
         }
+    }
+    Object.keys(plugins).forEach(function (plugin) {
+        resolvePlugin(plugin, false);
     });
     log.info('Plugin loading complete! \\o/');
 }
