@@ -57,21 +57,31 @@ Core.commands.devoice = new Command {perm: 'voice', usage: '[user]', desc: 'Devo
     if m[0]
         u = m[0]
     g.bot.send 'MODE', t, '-v', u
-Core.commands.kick = new Command {perm: 'op', args: 1, usage: '<user>', desc: 'Kicks a user from the channel'}, (g, m, u, t) =>
-    g.bot.send 'KICK', t, m[0], 'Kicked by ' + u
-Core.commands.remove = new Command {perm: 'op', args: 1, usage: '<user>', desc: 'Forcefully parts a user from the channel'}, (g, m, u, t) =>
-    g.bot.send 'REMOVE', t, m[0], 'Removed by ' + u
+Core.commands.kick = new Command {perm: 'op', args: 1, usage: '<user> [reason]', desc: 'Kicks a user from the channel'}, (g, m, u, t) =>
+    if !m[1]
+        m[1] = m[0]
+    g.bot.send 'KICK', t, m[0], ':' + m[1]
+Core.commands.remove = new Command {perm: 'op', args: 1, usage: '<user> [reason]', desc: 'Forcefully parts a user from the channel'}, (g, m, u, t) =>
+    if !m[1]
+        m[1] = m[0]
+    g.bot.send 'REMOVE', t, m[0], ':' + m[1]
 Core.commands.ban = new Command {perm: 'op', args: 1, usage: '<user> (whois)', desc: 'Bans a user. Add "whois" to ban hostmask.'}, (g, m, u, t) =>
     g.bot.send 'MODE', t, '+b', m[0]
     if m[1] && m[1] == 'whois'
-        g.bot.whois m[0], (whois) =>
-            g.bot.send 'MODE', t, '+b', whois.host
+        try
+            g.bot.whois m[0], (whois) =>
+                g.bot.send 'MODE', t, '+b', whois.host
+        catch error
+            g.bot.say t, u + ': Error when banning with whois.'
     g.bot.send 'REMOVE', t, m[0], 'Banned by ' + u
 Core.commands.unban = new Command {perm: 'op', args: 1, usage: '<user> (whois)', desc: 'Unbans a user. Add "whois" to unban hostmask.'}, (g, m, u, t) =>
     g.bot.send 'MODE', t, '-b', m[0]
     if m[1] && m[1] == 'whois'
-        g.bot.whois m[0], (whois) =>
-            g.bot.send 'MODE', t, '-b', whois.host
+        try
+            g.bot.whois m[0], (whois) =>
+                g.bot.send 'MODE', t, '-b', whois.host
+        catch error
+            g.bot.say t, u + ': Error when unbanning with whois.'
 Core.commands.die = new Command {perm: 'admin', usage: '', desc: 'Shuts the bot down. For admins only.'}, (g, m, u, t) =>
     g.bot.say t, u + ': *urk*'
     process.exit(0);
