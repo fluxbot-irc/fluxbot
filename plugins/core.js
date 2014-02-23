@@ -38,7 +38,6 @@ Core.modify = function (g) {
             });
             g.db.once('idle', function () {
                 setTimeout(function () {
-                    console.log(perms, perm);
                     if (perms.indexOf(perm) !== -1) {
                         callback(true);
                     } else {
