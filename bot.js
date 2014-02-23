@@ -212,11 +212,9 @@ bot.on('message', function (from, to, message, raw) {
                     return plugin.commands[cmd].run(global, args, from, to, raw);
                 } else {
                     global.hasPermission(raw.user + '@' + raw.host, plugin.commands[cmd].perm, to, function (perm) {
-                        console.log(perm)
                         if (!perm) {
                             return bot.notice(from, 'Error: ' + raw.user + '@' + raw.host + ' does not have the "' + plugin.commands[cmd].perm + '" permission for that channel.');
                         } else {
-                            console.log('Running')
                             return plugin.commands[cmd].run(global, args, from, to, raw);
                         }
                     });
