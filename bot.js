@@ -158,7 +158,7 @@ bot.on('invite', function (channel, from) {
     return bot.join(channel);
     bot.notice(from, 'Joining ' + channel);
 });
-bot.on('message', function (from, to, message) {
+bot.on('message', function (from, to, message, raw) {
     var caught;
     message = message.split(' ');
     if (!config.chanprefix[to]) {
@@ -185,11 +185,11 @@ bot.on('message', function (from, to, message) {
                         bot.notice(from, config.chanprefix[to] + ' ' + cmd + ' ' + plugin.commands[cmd].usage);
                         return bot.notice(from, 'Description: ' + plugin.commands[cmd].desc);
                     }
-                    global.hasPermission(from, plugin.commands[cmd].perm, to, function (perm) {
+                    global.hasPermission(raw.host, plugin.commands[cmd].perm, to, function (perm) {
                         if (plugin.commands[cmd].perm !== 'none' && !perm) {
-                            return bot.notice(from, 'Error: You don\'t have the "' + plugin.commands[cmd].perm + '" permission for that channel.');
+                            return bot.notice(from, 'Error: *!*@' + raw.host + ' does not have the "' + plugin.commands[cmd].perm + '" permission for that channel.');
                         } else {
-                            return plugin.commands[cmd].run(global, args, from, to);
+                            return plugin.commands[cmd].run(global, args, from, to, raw);
                         }
                     });
                 }
@@ -204,11 +204,11 @@ bot.on('message', function (from, to, message) {
                     bot.notice(from, config.chanprefix[to] + ' ' + cmd + ' ' + plugin.commands[cmd].usage);
                     return bot.notice(from, 'Description: ' + plugin.commands[cmd].desc);
                 }
-                return global.hasPermission(from, plugin.commands[cmd].perm, to, function (perm) {
+                return global.hasPermission(raw.host, plugin.commands[cmd].perm, to, function (perm) {
                     if (plugin.commands[cmd].perm !== 'none' && !perm) {
-                        return bot.notice(from, 'Error: You don\'t have the "' + plugin.commands[cmd].perm + '" permission for that channel.');
+                        return bot.notice(from, 'Error: *!*@' + raw.host + ' does not have the "' + plugin.commands[cmd].perm + '" permission for that channel.');
                     } else {
-                        return plugin.commands[cmd].run(global, args, from, to);
+                        return plugin.commands[cmd].run(global, args, from, to, raw);
                     }
                 });
             }

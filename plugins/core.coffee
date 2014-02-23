@@ -96,10 +96,10 @@ Core.commands.repl = new Command {perm: 'admin', usage: '', desc: 'Starts a REPL
     repl.start {prompt: "fluxbot> ", input: process.stdin, output: process.stdout, useGlobal: true}
 Core.commands.givePerm = new Command {args: 2, perm: 'admin', usage: '<user> <perm>', desc: 'Gives <user> the <perm> permission.'}, (g, m, u, t) =>
     g.db.sadd(m[0] + '/perms', t + ',' + m[1]);
-    g.bot.say t, u + ': Giving ' + m[0] + ' the permission ' + t + ',' + m[1]
+    g.bot.say t, u + ': Giving *!*@' + m[0] + ' the permission ' + t + ',' + m[1]
 Core.commands.takePerm = new Command {args: 2, perm: 'admin', usage: '<user> <perm>', desc: 'Takes away <perm> from <user>'}, (g, m, u, t) =>
     g.db.srem(m[0] + '/perms', t + ',' + m[1]);
-    g.bot.say t, u + ': Taking ' + m[0] + '\'s permission ' + t + ',' + m[1]
+    g.bot.say t, u + ': Taking *!*@' + m[0] + '\'s permission ' + t + ',' + m[1]
 Core.commands.cycle = new Command {perm: 'admin', usage: '', desc: 'Parts then rejoins the channel.'}, (g, m, u, t) =>
     g.bot.part(t, "Cycling channel..");
     g.bot.join(t);
@@ -117,19 +117,19 @@ Core.commands.say = new Command {perm: 'op', args: 1, usage: '<text>', desc: 'Sa
     g.bot.say t, m.join ' '
 Core.commands.action = new Command {perm: 'op', args: 1, usage: '<text>', desc: 'Actions <text>.'}, (g, m, u, t) =>
     g.bot.action t, m.join ' '
-Core.commands.myperms = new Command {usage: '', desc: 'Lists your global permissions.'}, (g, m, u, t) =>
-    g.db.smembers u + '/perms', (err, perms) =>
+Core.commands.myperms = new Command {usage: '', desc: 'Lists your global permissions.'}, (g, m, u, t, r) =>
+    g.db.smembers r.host + '/perms', (err, perms) =>
         g.bot.say u, 'Your permissions: ' + perms.join(' ')
-Core.commands.chanperms = new Command {usage: '', desc: 'Lists your permissons for this channel.'}, (g, m, u, t) =>
-    g.db.smembers u + '/perms', (err, perms) =>
+Core.commands.chanperms = new Command {usage: '', desc: 'Lists your permissons for this channel.'}, (g, m, u, t, r) =>
+    g.db.smembers r.host + '/perms', (err, perms) =>
         perms.forEach (perm, i) =>
             if perm.indexOf(t) == -1
                 perms.splice i, 1
             else
                 perm = perm.replace(t + ',', '')
         g.bot.say u, 'Your permissions for ' + t + ': ' + perms.join(' ');
-Core.commands.chanstats = new Command {usage: '', desc: 'Lists your permissions in a human-readable way.'}, (g, m, u, t) =>
-    g.db.smembers u + '/perms', (err, perms) =>
+Core.commands.chanstats = new Command {usage: '', desc: 'Lists your permissions in a human-readable way.'}, (g, m, u, t, r) =>
+    g.db.smembers r.host + '/perms', (err, perms) =>
         str = u + ': '
         if perms.indexOf('admin') != -1
             str += 'You are a fluxbot admin! | '
