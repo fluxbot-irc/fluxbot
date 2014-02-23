@@ -35,6 +35,7 @@ global.loadPlugins = function () {
     log.info('Resolving dependencies');
     var modified = [];
     var currentPlugin = 'none';
+
     function resolvePlugin(plugin, depth) {
         plugin = plugins[plugin];
         if (nomod.indexOf(plugin.name) != -1 || modified.indexOf(plugin.name) != -1) {
@@ -51,8 +52,7 @@ global.loadPlugins = function () {
             plugin.dependencies.forEach(function (plugin) {
                 if (depth) {
                     log.info('Resolving dependency ' + plugin + ' [resolving: ' + currentPlugin + ']')
-                }
-                else {
+                } else {
                     log.info('Resolving dependency ' + plugin)
                 }
                 if (!plugins[plugin]) {
@@ -185,13 +185,19 @@ bot.on('message', function (from, to, message, raw) {
                         bot.notice(from, config.chanprefix[to] + ' ' + cmd + ' ' + plugin.commands[cmd].usage);
                         return bot.notice(from, 'Description: ' + plugin.commands[cmd].desc);
                     }
-                    global.hasPermission(raw.host, plugin.commands[cmd].perm, to, function (perm) {
-                        if (plugin.commands[cmd].perm !== 'none' && !perm) {
-                            return bot.notice(from, 'Error: *!*@' + raw.host + ' does not have the "' + plugin.commands[cmd].perm + '" permission for that channel.');
-                        } else {
-                            return plugin.commands[cmd].run(global, args, from, to, raw);
-                        }
-                    });
+                    if (plugin.commands[cmd].perm == 'none') {
+                        return plugin.commands[cmd].run(global, args, from, to, raw);
+                    } else {
+                        global.hasPermission(raw.user + '@' + raw.host, plugin.commands[cmd].perm, to, function (perm) {
+                            console.log(perm)
+                            if (!perm) {
+                                return bot.notice(from, 'Error: ' + raw.user + '@' + raw.host + ' does not have the "' + plugin.commands[cmd].perm + '" permission for that channel.');
+                            } else {
+                                console.log('Running')
+                                return plugin.commands[cmd].run(global, args, from, to, raw);
+                            }
+                        });
+                    }
                 }
             }
             if (Object.keys(plugin.commands).indexOf(message[1]) !== -1) {
@@ -204,13 +210,19 @@ bot.on('message', function (from, to, message, raw) {
                     bot.notice(from, config.chanprefix[to] + ' ' + cmd + ' ' + plugin.commands[cmd].usage);
                     return bot.notice(from, 'Description: ' + plugin.commands[cmd].desc);
                 }
-                return global.hasPermission(raw.host, plugin.commands[cmd].perm, to, function (perm) {
-                    if (plugin.commands[cmd].perm !== 'none' && !perm) {
-                        return bot.notice(from, 'Error: *!*@' + raw.host + ' does not have the "' + plugin.commands[cmd].perm + '" permission for that channel.');
-                    } else {
-                        return plugin.commands[cmd].run(global, args, from, to, raw);
-                    }
-                });
+                if (plugin.commands[cmd].perm == 'none') {
+                    return plugin.commands[cmd].run(global, args, from, to, raw);
+                } else {
+                    global.hasPermission(raw.user + '@' + raw.host, plugin.commands[cmd].perm, to, function (perm) {
+                        console.log(perm)
+                        if (!perm) {
+                            return bot.notice(from, 'Error: ' + raw.user + '@' + raw.host + ' does not have the "' + plugin.commands[cmd].perm + '" permission for that channel.');
+                        } else {
+                            console.log('Running')
+                            return plugin.commands[cmd].run(global, args, from, to, raw);
+                        }
+                    });
+                }
             }
         });
         if (!caught) {
