@@ -17,7 +17,7 @@ fs = require('fs');
 global.config = require('./config.json');
 global.plugins = {};
 global.loadPlugins = function () {
-    log.info('Loading plugins');
+    log.debug('Loading plugins');
     var nomod = [];
     fs.readdirSync('./plugins').forEach(function (file) {
         var modify = true;
@@ -30,9 +30,9 @@ global.loadPlugins = function () {
         if (typeof plugins[file.split('.')[0]].desc == 'undefined') {
             plugins[file.split('.')[0]].desc = 'No description given'
         }
-        log.info('Loaded plugin ' + file.split('.')[0] + ' - ' + plugins[file.split('.')[0]].desc);
+        log.debug('Loaded plugin ' + file.split('.')[0] + ' - ' + plugins[file.split('.')[0]].desc);
     });
-    log.info('Resolving dependencies');
+    log.debug('Resolving dependencies');
     var modified = [];
     var currentPlugin = 'none';
 
@@ -40,20 +40,20 @@ global.loadPlugins = function () {
         plugin = plugins[plugin];
         if (nomod.indexOf(plugin.name) != -1 || modified.indexOf(plugin.name) != -1) {
             modified.push(plugin.name); // no-op
-            log.info('Already satisfied plugin ' + plugin.name);
+            log.debug('Already satisfied plugin ' + plugin.name);
             return;
         }
         if (plugin.dependencies && plugin.modify) {
-            log.info('Resolving plugin ' + plugin.name);
+            log.debug('Resolving plugin ' + plugin.name);
             if (!depth) {
                 currentPlugin = plugin.name;
             }
             var errors = false;
             plugin.dependencies.forEach(function (plugin) {
                 if (depth) {
-                    log.info('Resolving dependency ' + plugin + ' [resolving: ' + currentPlugin + ']')
+                    log.debug('Resolving dependency ' + plugin + ' [resolving: ' + currentPlugin + ']')
                 } else {
-                    log.info('Resolving dependency ' + plugin)
+                    log.debug('Resolving dependency ' + plugin)
                 }
                 if (!plugins[plugin]) {
                     log.error('Dependency not fulfilled: ' + plugin);
@@ -62,7 +62,7 @@ global.loadPlugins = function () {
                     return;
                 }
                 if (plugin == currentPlugin) {
-                    log.error('Circular dependency found in plugins: ' + currentPlugin + ' + ' + plugin);
+                    log.error('pls. circular dependency found in plugins: ' + currentPlugin + ' + ' + plugin);
                     errors = true;
                     modified.push(plugin);
                     return;
@@ -72,7 +72,7 @@ global.loadPlugins = function () {
             if (!errors) {
                 plugin.modify(global);
                 modified.push(plugin.name);
-                log.info('Satisfied plugin ' + plugin.name);
+                log.debug('Satisfied plugin ' + plugin.name);
             } else {
                 log.error('Failed to satisfy plugin ' + plugin.name);
                 delete plugins[plugin.name];
@@ -82,7 +82,7 @@ global.loadPlugins = function () {
                 plugin.modify(global);
             }
             modified.push(plugin.name);
-            log.info('Satisfied plugin ' + plugin.name);
+            log.debug('Satisfied plugin ' + plugin.name);
         }
     }
     Object.keys(plugins).forEach(function (plugin) {
@@ -121,7 +121,7 @@ Object.keys(plugins).forEach(function (plugin) {
 log.info('Starting Fluxbot ' + require('./package.json').version);
 loadPlugins();
 log.info('Loaded plugins:', Object.keys(plugins).join(', '));
-log.info('Connecting to', config.server);
+log.info('Connecting to IRC (', config.server + ':' + config.port + ')');
 log.info('Connecting to Redis DB...');
 
 global.db = redis.createClient(config.redis_port, config.redis_host);
