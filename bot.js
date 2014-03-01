@@ -1,10 +1,11 @@
-var coffee, irc, log, redis, repl, ready, fs,
+var coffee, irc, log, redis, repl, ready, fs, log,
     _this = this;
 irc = require('irc');
 
 coffee = require('coffee-script/register');
 
-log = require('winston');
+winston = require('winston');
+
 
 redis = require('redis');
 
@@ -15,6 +16,20 @@ repl = require('repl');
 fs = require('fs');
 
 global.config = require('./config.json');
+if (!config.level && config.debug) {
+    config.level = 'debug';
+}
+if (!config.level) {
+    config.level = 'info';
+}
+log = new(winston.Logger)({
+    transports: [
+      new(winston.transports.Console)({
+            level: config.level
+        })
+    ]
+});
+
 global.plugins = {};
 global.loadPlugins = function () {
     log.debug('Loading plugins');
@@ -31,6 +46,21 @@ global.loadPlugins = function () {
             plugins[file.split('.')[0]].desc = 'No description given'
         }
         log.debug('Loaded plugin ' + file.split('.')[0] + ' - ' + plugins[file.split('.')[0]].desc);
+    });
+    fs.readdirSync('./node_modules').forEach(function (dir) {
+        if (dir.indexOf('fluxbot-') != -1) {
+            var modify = true;
+            if (require.cache[__dirname + '/node_modules/' + dir + '/index.js']) {
+                delete require.cache[__dirname + '/node_modules/' + dir + '/index.js'];
+                nomod.push(file.split('.')[0]);
+            }
+            plugins[file.split('-')[1]] = require(__dirname + '/node_modules/' + dir + '/index.js');
+            plugins[file.split('-')[1]].name = file.split('-')[1];
+            if (typeof plugins[file.split('-')[1]].desc == 'undefined') {
+                plugins[file.split('-')[1]].desc = 'No description given'
+            }
+            log.debug('Loaded plugin ' + dir.split('-')[1] + ' - ' + plugins[file.split('.')[0]].desc);
+        }
     });
     log.debug('Resolving dependencies');
     var modified = [];
@@ -119,10 +149,11 @@ Object.keys(plugins).forEach(function (plugin) {
 });
 
 log.info('Starting Fluxbot ' + require('./package.json').version);
+log.info('Log level: ' + config.level);
 loadPlugins();
 log.info('Loaded plugins:', Object.keys(plugins).join(', '));
-log.info('Connecting to IRC (', config.server + ':' + config.port + ')');
-log.info('Connecting to Redis DB...');
+log.info('Connecting to IRC [', config.server + ':' + config.port + ']');
+log.info('Connecting to Redis [' + config.redis_host + ':' + config.redis_port + ']');
 
 global.db = redis.createClient(config.redis_port, config.redis_host);
 
@@ -137,12 +168,10 @@ db.on('ready', function () {
     }
 });
 bot.on('raw', function (data) {
-    if (config.debug) {
-        log.info(data.command, data.args.join(' '));
-    }
+    log.debug(data.prefix, data.command, data.args.join(' '));
     switch (data.command) {
-    case "rpl_endofmotd":
-        log.info('Connected to ' + config.server);
+    case "001":
+        log.info('Connected to IRC [' + config.server + ':' + config.port + ']');
     }
 });
 
