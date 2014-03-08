@@ -60,7 +60,7 @@ ACL.commands.givePerm = new Command({
         permlist = permlist.split('|');
         permlist.push(m[1]);
         g.db.hset('acl', m[0], permlist.join('|'));
-        return g.bot.say(t, u + ': ACL modified.');
+        return g.bot.notice(u, 'ACL modified.');
     });
 });
 
@@ -77,7 +77,7 @@ ACL.commands.takePerm = new Command({
         permlist = permlist.split('|');
         permlist.splice(permlist.indexOf(m[1]), 1);
         g.db.hset('acl', m[0], permlist.join('|'));
-        return g.bot.say(t, u + ': ACL modified.');
+        return g.bot.notice(u, 'ACL modified.');
     });
 });
 ACL.commands.perm = new Command({

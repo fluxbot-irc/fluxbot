@@ -132,6 +132,7 @@ global.bot = new irc.Client(config.server, config.nick, {
     port: config.port,
     password: config.nickserv_password,
     userName: config.nick,
+    floodProtection: true,
     realName: 'Fluxbot ' + require('./package.json').version
 });
 
