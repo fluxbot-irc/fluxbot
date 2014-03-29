@@ -1,19 +1,16 @@
-var coffee, irc, log, redis, repl, ready, fs, log,
-    _this = this;
-irc = require('irc');
+/*
+    Fluxbot, an IRC bot by whiskers75
+    Warning: Contents may be coded badly.
+*/
 
-coffee = require('coffee-script/register');
+/* jshint asi: true, undef: false */
 
-winston = require('winston');
-
-
-redis = require('redis');
-
-ready = false;
-
-repl = require('repl');
-
-fs = require('fs');
+var irc = require('irc');
+var coffee = require('coffee-script/register');
+var winston = require('winston');
+var redis = require('redis');
+var ready = false;
+var fs = require('fs');
 
 global.config = require('./config.json');
 if (!config.level && config.debug) {
@@ -164,8 +161,8 @@ if (config.redis_password) {
 
 db.on('ready', function () {
     if (!ready) {
-        return log.info('Connected to Redis');
-        ready = true
+        log.info('Connected to Redis');
+        ready = true;
     }
 });
 bot.on('raw', function (data) {
@@ -184,23 +181,20 @@ bot.on('notice', function (from, to, message) {
     }
 });
 
-bot.on('invite', function (channel, from) {
-    return bot.join(channel);
-    bot.notice(from, 'Joining ' + channel);
-});
 bot.on('message', function (from, to, message, raw) {
     var caught;
     message = message.split(' ');
     if (!config.chanprefix[to]) {
         config.chanprefix[to] = config.prefix;
     }
+    caught = false;
     Object.keys(plugins).forEach(function (plugin) {
         if (plugin.onMessage) {
             plugin.onMessage(global, from, to, message, (message[0] === config.nick + ':' || message[0] == config.chanprefix[to]));
+            caught = true;
         }
     });
-    if (message[0] === config.nick + ':' || message[0] == config.chanprefix[to]) {
-        caught = false;
+    if ((message[0] === config.nick + ':' || message[0] == config.chanprefix[to]) && !caught) {
         Object.keys(plugins).forEach(function (plugin) {
             var args, cmd;
             plugin = plugins[plugin];
@@ -211,7 +205,7 @@ bot.on('message', function (from, to, message, raw) {
                     args.splice(0, 3);
                     caught = true;
                     if (args.length < plugin.commands[cmd].args) {
-                        bot.notice(from, 'That command requires ' + plugin.commands[cmd].args + ' argument(s).');
+                        bot.notice(from, 'Error: That command requires ' + plugin.commands[cmd].args + ' argument(s).');
                         bot.notice(from, config.chanprefix[to] + ' ' + cmd + ' ' + plugin.commands[cmd].usage);
                         return bot.notice(from, 'Description: ' + plugin.commands[cmd].desc);
                     }
@@ -220,7 +214,7 @@ bot.on('message', function (from, to, message, raw) {
                     } else {
                         global.hasPermission(raw.user + '@' + raw.host, plugin.commands[cmd].perm, to, function (perm) {
                             if (!perm) {
-                                return bot.notice(from, 'Error: ' + raw.user + '@' + raw.host + ' does not have the "' + plugin.commands[cmd].perm + '" permission for that channel.');
+                                return bot.notice(from, 'Error: You do not have the "' + plugin.commands[cmd].perm + '" permission for ' + to + '.');
                             } else {
                                 return plugin.commands[cmd].run(global, args, from, to, raw);
                             }
@@ -243,7 +237,7 @@ bot.on('message', function (from, to, message, raw) {
                 } else {
                     global.hasPermission(raw.user + '@' + raw.host, plugin.commands[cmd].perm, to, function (perm) {
                         if (!perm) {
-                            return bot.notice(from, 'Error: ' + raw.user + '@' + raw.host + ' does not have the "' + plugin.commands[cmd].perm + '" permission for that channel.');
+                            return bot.notice(from, 'Error: You do not have the "' + plugin.commands[cmd].perm + '" permission for ' + to + '.');
                         } else {
                             return plugin.commands[cmd].run(global, args, from, to, raw);
                         }

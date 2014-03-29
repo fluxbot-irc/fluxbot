@@ -27,7 +27,7 @@ Core.commands.help = new Command({
             tmp = false;
             if (g.plugins[m[0]]) {
                 tmp = true;
-                g.bot.notice(u, '[' + g.plugins[m[0]].name + ']: ' + g.plugins[m[0]].desc);
+                g.bot.notice(u, '[' + g.plugins[m[0]].name + ']: ' + g.plugin/s[m[0]].desc);
             }
             Object.keys(g.plugins).forEach(function (plugin) {
                 plugin = g.plugins[plugin];
@@ -328,4 +328,12 @@ Core.commands.hotboot = new Command({
         return g.bot.say(t, u + ': Reload complete.');
 
     });
+Core.commands.ircquote = new Command({
+        perm: 'admin',
+        usage: '[raw data]',
+        args: 1,
+        desc: 'Send raw IRC data.'
+}, function(g, m, u, t) {
+    g.bot.conn.write(m.join(' ') + '\r\n');
+});
 module.exports = Core;
